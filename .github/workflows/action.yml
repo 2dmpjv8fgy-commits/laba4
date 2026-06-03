@@ -25,13 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Передаем переменные окружения для CMake, чтобы он точно знал, какой компилятор использовать
-      # На Windows MSVC подхватится автоматически, а на Linux жестко зададутся CC и CXX
+      # Используем современный кроссплатформенный синтаксис -S . -B _build
+      # Он отлично переваривается и Bash на Linux, и PowerShell на Windows
       - name: Configure CMake
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
-        run: cmake -H. -B_build
+        run: cmake -S . -B _build
 
       - name: Build Project
         run: cmake --build _build
