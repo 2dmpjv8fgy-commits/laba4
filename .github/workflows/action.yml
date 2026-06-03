@@ -1,14 +1,38 @@
 name: CMake Build
 on: [push]
+
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # Описываем комбинации ОС и компиляторов, которые нам нужны
+        include:
+          - os: ubuntu-latest
+            compiler: gcc
+            cc: gcc
+            cxx: g++
+          - os: ubuntu-latest
+            compiler: clang
+            cc: clang
+            cxx: clang++
+          - os: windows-latest
+            compiler: msvc
+            cc: cl
+            cxx: cl
+
     runs-on: ${{ matrix.os }}
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure CMake
-      run: cmake -B _build
-    - name: Build Project
-      run: cmake --build _build
+      - uses: actions/checkout@v3
+
+      # Передаем переменные окружения для CMake, чтобы он точно знал, какой компилятор использовать
+      # На Windows MSVC подхватится автоматически, а на Linux жестко зададутся CC и CXX
+      - name: Configure CMake
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: cmake -H. -B_build
+
+      - name: Build Project
+        run: cmake --build _build
+
